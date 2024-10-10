@@ -9,6 +9,17 @@ interface Props {
   };
 }
 
+//! This will be executed in build time to create static possible params we can have
+export async function generateStaticParams() {
+  const static151Pokemons = Array.from({ length: 151 }).map((v, i) =>
+    String(i + 1)
+  );
+
+  return static151Pokemons.map((id) => ({
+    id,
+  }));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const { id, name } = await getPokemon(params.id);
@@ -18,6 +29,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: `Page description of pokemon ${name}`,
     };
   } catch (error) {
+    console.error(error);
+
     return {
       title: "Page not found",
       description: "Page not found",
@@ -28,13 +41,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const getPokemon = async (id: string): Promise<Pokemon> => {
   try {
     const pokemon = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`, {
-      cache: "force-cache",
+      // cache: "force-cache",
+      next: {
+        revalidate: 60 * 60 * 30 * 6,
+      },
     }).then((res) => res.json());
-
-    console.log(pokemon.name);
 
     return pokemon;
   } catch (error) {
+    console.error(error);
+
     notFound();
   }
 };
