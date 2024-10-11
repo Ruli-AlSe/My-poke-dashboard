@@ -1,5 +1,3 @@
-import { PokemonGrid, PokemonsResponse, SimplePokemon } from "@/pokemons";
-
 export const metadata = {
   title: "Favorites",
   describe: "Favorite pokemons",
